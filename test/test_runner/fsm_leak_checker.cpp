@@ -73,11 +73,8 @@ void FSMLeakChecker::checkForLeakedPages(main::Connection* conn) {
         }
 
         auto result = conn->query(dropQuery);
-        if (!result->isSuccess()) {
-            std::cerr << "Failed to drop index " << indexName << " on " << tableName << std::endl;
-        } else {
-            std::cout << "Dropped index " << indexName << " on " << tableName << std::endl;
-        }
+        ASSERT_TRUE(result->isSuccess())
+            << "Failed to drop index " << indexName << " on " << tableName << std::endl;
     }
 
     // Enable internal catalog to see all tables including hidden ones
@@ -95,7 +92,6 @@ void FSMLeakChecker::checkForLeakedPages(main::Connection* conn) {
     // Drop rel tables first
     for (const auto& [name, type] : tableNames) {
         if (type == common::TableTypeUtils::toString(common::TableType::REL)) {
-            std::cout << "Trying to drop table " << name << std::endl;
             ASSERT_TRUE(conn->query(common::stringFormat("drop table `{}`", name))->isSuccess());
         }
     }
